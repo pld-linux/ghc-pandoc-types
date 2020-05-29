@@ -6,51 +6,43 @@
 Summary:	Types for representing a structured document
 Summary(pl.UTF-8):	Typy do reprezentowania dokumentu posiadającego strukturę
 Name:		ghc-%{pkgname}
-Version:	1.12.3
+Version:	1.20
 Release:	1
 License:	GPL v2+
 Group:		Development/Languages
 #Source0Download: http://hackage.haskell.org/package/pandoc-types
 Source0:	http://hackage.haskell.org/package/%{pkgname}-%{version}/%{pkgname}-%{version}.tar.gz
-# Source0-md5:	4fd3d4c52ac958353b2d340e88eedfe3
+# Source0-md5:	3bd9ed959e53bc4f2d2457098db584f2
+Patch0:		QuickCheck-2.14.patch
 URL:		http://hackage.haskell.org/package/pandoc-types
 BuildRequires:	ghc >= 6.12.3
+BuildRequires:	ghc-QuickCheck
 BuildRequires:	ghc-aeson >= 0.6.2
-BuildRequires:	ghc-aeson < 0.7
 BuildRequires:	ghc-base >= 4
-BuildRequires:	ghc-base < 5
 BuildRequires:	ghc-bytestring >= 0.9
-BuildRequires:	ghc-bytestring < 0.11
 BuildRequires:	ghc-containers >= 0.3
 BuildRequires:	ghc-ghc-prim >= 0.2
 BuildRequires:	ghc-syb >= 0.1
-BuildRequires:	ghc-syb < 0.5
 %if %{with prof}
 BuildRequires:	ghc-prof >= 6.12.3
+BuildRequires:	ghc-QuickCheck-prof
 BuildRequires:	ghc-aeson-prof >= 0.6.2
-BuildRequires:	ghc-aeson-prof < 0.7
 BuildRequires:	ghc-base-prof >= 4
-BuildRequires:	ghc-base-prof < 5
 BuildRequires:	ghc-bytestring-prof >= 0.9
-BuildRequires:	ghc-bytestring-prof < 0.11
 BuildRequires:	ghc-containers-prof >= 0.3
 BuildRequires:	ghc-ghc-prim-prof >= 0.2
 BuildRequires:	ghc-syb-prof >= 0.1
-BuildRequires:	ghc-syb-prof < 0.5
 %endif
 BuildRequires:	rpmbuild(macros) >= 1.608
 Requires(post,postun):	/usr/bin/ghc-pkg
 %requires_eq	ghc
+Requires:	ghc-QuickCheck
 Requires:	ghc-aeson >= 0.6.2
-Requires:	ghc-aeson < 0.7
 Requires:	ghc-base >= 4
-Requires:	ghc-base < 5
 Requires:	ghc-bytestring >= 0.9
-Requires:	ghc-bytestring < 0.11
 Requires:	ghc-containers >= 0.3
 Requires:	ghc-ghc-prim >= 0.2
 Requires:	ghc-syb >= 0.1
-Requires:	ghc-syb < 0.5
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 # debuginfo is not useful for ghc
@@ -104,16 +96,13 @@ Summary:	Profiling %{pkgname} library for GHC
 Summary(pl.UTF-8):	Biblioteka profilująca %{pkgname} dla GHC
 Group:		Development/Libraries
 Requires:	%{name} = %{version}-%{release}
+Requires:	ghc-QuickCheck-prof
 Requires:	ghc-aeson-prof >= 0.6.2
-Requires:	ghc-aeson-prof < 0.7
 Requires:	ghc-base-prof >= 4
-Requires:	ghc-base-prof < 5
 Requires:	ghc-bytestring-prof >= 0.9
-Requires:	ghc-bytestring-prof < 0.11
 Requires:	ghc-containers-prof >= 0.3
 Requires:	ghc-ghc-prim-prof >= 0.2
 Requires:	ghc-syb-prof >= 0.1
-Requires:	ghc-syb-prof < 0.5
 
 %description prof
 Profiling %{pkgname} library for GHC. Should be installed when
@@ -136,6 +125,7 @@ Dokumentacja w formacie HTML dla pakietu ghc %{pkgname}.
 
 %prep
 %setup -q -n %{pkgname}-%{version}
+%patch0 -p1
 
 %build
 runhaskell Setup.hs configure -v2 \
@@ -175,17 +165,26 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644,root,root,755)
 %{_libdir}/%{ghcdir}/package.conf.d/%{pkgname}.conf
 %dir %{_libdir}/%{ghcdir}/%{pkgname}-%{version}
-%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/HSpandoc-types-%{version}.o
-%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/libHSpandoc-types-%{version}.a
+%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/libHSpandoc-types-%{version}-*.so
+%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/libHSpandoc-types-%{version}-*.a
+%exclude %{_libdir}/%{ghcdir}/%{pkgname}-%{version}/libHSpandoc-types-%{version}-*_p.a
+%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/*.hi
+%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/*.dyn_hi
 %dir %{_libdir}/%{ghcdir}/%{pkgname}-%{version}/Text
 %dir %{_libdir}/%{ghcdir}/%{pkgname}-%{version}/Text/Pandoc
 %{_libdir}/%{ghcdir}/%{pkgname}-%{version}/Text/Pandoc/*.hi
+%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/Text/Pandoc/*.dyn_hi
+%dir %{_libdir}/%{ghcdir}/%{pkgname}-%{version}/Text/Pandoc/Legacy
+%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/Text/Pandoc/Legacy/*.hi
+%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/Text/Pandoc/Legacy/*.dyn_hi
 
 %if %{with prof}
 %files prof
 %defattr(644,root,root,755)
-%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/libHSpandoc-types-%{version}_p.a
+%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/libHSpandoc-types-%{version}-*_p.a
+%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/*.p_hi
 %{_libdir}/%{ghcdir}/%{pkgname}-%{version}/Text/Pandoc/*.p_hi
+%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/Text/Pandoc/Legacy/*.p_hi
 %endif
 
 %files doc
