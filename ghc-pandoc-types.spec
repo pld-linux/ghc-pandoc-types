@@ -7,7 +7,7 @@ Summary:	Types for representing a structured document
 Summary(pl.UTF-8):	Typy do reprezentowania dokumentu posiadającego strukturę
 Name:		ghc-%{pkgname}
 Version:	1.20
-Release:	1
+Release:	2
 License:	GPL v2+
 Group:		Development/Languages
 #Source0Download: http://hackage.haskell.org/package/pandoc-types
