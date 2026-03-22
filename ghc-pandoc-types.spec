@@ -15,34 +15,54 @@ Source0:	http://hackage.haskell.org/package/%{pkgname}-%{version}/%{pkgname}-%{v
 # Source0-md5:	3bd9ed959e53bc4f2d2457098db584f2
 Patch0:		QuickCheck-2.14.patch
 URL:		http://hackage.haskell.org/package/pandoc-types
-BuildRequires:	ghc >= 6.12.3
+BuildRequires:	ghc >= 7.4.1
 BuildRequires:	ghc-QuickCheck
 BuildRequires:	ghc-aeson >= 0.6.2
-BuildRequires:	ghc-base >= 4
+BuildRequires:	ghc-aeson < 1.5
+BuildRequires:	ghc-base >= 4.5
+BuildRequires:	ghc-base < 5
 BuildRequires:	ghc-bytestring >= 0.9
+BuildRequires:	ghc-bytestring < 0.11
 BuildRequires:	ghc-containers >= 0.3
+BuildRequires:	ghc-deepseq >= 1.4.1
+BuildRequires:	ghc-deepseq < 1.5
 BuildRequires:	ghc-ghc-prim >= 0.2
 BuildRequires:	ghc-syb >= 0.1
+BuildRequires:	ghc-syb < 0.8
+BuildRequires:	ghc-text
+BuildRequires:	ghc-transformers >= 0.2
+BuildRequires:	ghc-transformers < 0.6
 %if %{with prof}
-BuildRequires:	ghc-prof >= 6.12.3
+BuildRequires:	ghc-prof >= 7.4.1
 BuildRequires:	ghc-QuickCheck-prof
 BuildRequires:	ghc-aeson-prof >= 0.6.2
-BuildRequires:	ghc-base-prof >= 4
+BuildRequires:	ghc-aeson-prof < 1.5
+BuildRequires:	ghc-base-prof >= 4.5
+BuildRequires:	ghc-base-prof < 5
 BuildRequires:	ghc-bytestring-prof >= 0.9
+BuildRequires:	ghc-bytestring-prof < 0.11
 BuildRequires:	ghc-containers-prof >= 0.3
+BuildRequires:	ghc-deepseq-prof >= 1.4.1
+BuildRequires:	ghc-deepseq-prof < 1.5
 BuildRequires:	ghc-ghc-prim-prof >= 0.2
 BuildRequires:	ghc-syb-prof >= 0.1
+BuildRequires:	ghc-syb-prof < 0.8
+BuildRequires:	ghc-text-prof
+BuildRequires:	ghc-transformers-prof >= 0.2
+BuildRequires:	ghc-transformers-prof < 0.6
 %endif
 BuildRequires:	rpmbuild(macros) >= 1.608
 Requires(post,postun):	/usr/bin/ghc-pkg
 %requires_eq	ghc
 Requires:	ghc-QuickCheck
 Requires:	ghc-aeson >= 0.6.2
-Requires:	ghc-base >= 4
+Requires:	ghc-base >= 4.5
 Requires:	ghc-bytestring >= 0.9
 Requires:	ghc-containers >= 0.3
+Requires:	ghc-deepseq >= 1.4.1
 Requires:	ghc-ghc-prim >= 0.2
 Requires:	ghc-syb >= 0.1
+Requires:	ghc-transformers >= 0.2
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 # debuginfo is not useful for ghc
@@ -98,15 +118,17 @@ Group:		Development/Libraries
 Requires:	%{name} = %{version}-%{release}
 Requires:	ghc-QuickCheck-prof
 Requires:	ghc-aeson-prof >= 0.6.2
-Requires:	ghc-base-prof >= 4
+Requires:	ghc-base-prof >= 4.5
 Requires:	ghc-bytestring-prof >= 0.9
 Requires:	ghc-containers-prof >= 0.3
+Requires:	ghc-deepseq-prof >= 1.4.1
 Requires:	ghc-ghc-prim-prof >= 0.2
 Requires:	ghc-syb-prof >= 0.1
+Requires:	ghc-transformers-prof >= 0.2
 
 %description prof
-Profiling %{pkgname} library for GHC. Should be installed when
-GHC's profiling subsystem is needed.
+Profiling %{pkgname} library for GHC. Should be installed when GHC's
+profiling subsystem is needed.
 
 %description prof -l pl.UTF-8
 Biblioteka profilująca %{pkgname} dla GHC. Powinna być zainstalowana
@@ -136,6 +158,7 @@ runhaskell Setup.hs configure -v2 \
 	--docdir=%{_docdir}/%{name}-%{version}
 
 runhaskell Setup.hs build
+
 runhaskell Setup.hs haddock --executables
 
 %install
@@ -146,8 +169,7 @@ runhaskell Setup.hs copy --destdir=$RPM_BUILD_ROOT
 
 # work around automatic haddock docs installation
 %{__rm} -rf %{name}-%{version}-doc
-cp -a $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version} %{name}-%{version}-doc
-%{__rm} -r $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}
+%{__mv} $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version} %{name}-%{version}-doc
 
 runhaskell Setup.hs register \
 	--gen-pkg-config=$RPM_BUILD_ROOT%{_libdir}/%{ghcdir}/package.conf.d/%{pkgname}.conf
@@ -163,6 +185,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
+%doc LICENSE changelog
 %{_libdir}/%{ghcdir}/package.conf.d/%{pkgname}.conf
 %dir %{_libdir}/%{ghcdir}/%{pkgname}-%{version}
 %{_libdir}/%{ghcdir}/%{pkgname}-%{version}/libHSpandoc-types-%{version}-*.so
